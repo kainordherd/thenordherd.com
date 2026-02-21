@@ -1,0 +1,30 @@
+---
+export const prerender = true
+
+import PostLayout from '@/layouts/PostLayout.astro'
+import PortableText from '@/components/widgets/PortableText.astro'
+import { getAllPostSlugs, getPostBySlug } from '@/utils/sanity'
+import { getReadingTimeFromPortableText, getTOCFromPortableText } from '@/utils/portable-text'
+
+export async function getStaticPaths() {
+  const slugs = await getAllPostSlugs()
+  return slugs.map((slug) => ({
+    params: { slug },
+    props: { slug }
+  }))
+}
+
+const { slug } = Astro.props as { slug: string }
+const post = await getPostBySlug(slug)
+
+if (!post) {
+  throw new Error(`[Sanity] Post not found for slug: ${slug}`)
+}
+
+const readingTime = getReadingTimeFromPortableText(post.body)
+const toc = getTOCFromPortableText(post.body)
+---
+
+<PostLayout title={post.title} pubDate={post.pubDate} readingTime={readingTime} toc={toc}>
+  <PortableText value={post.body} toc={toc} />
+</PostLayout>

@@ -1,0 +1,118 @@
+---
+import type { PostListProps } from '@/types'
+
+const { posts } = Astro.props as PostListProps
+
+const getYear = (date: Date) => date.getFullYear()
+const getMonthDay = (date: Date) => {
+  return (date.getMonth() + 1).toString().padStart(2, '0') + '/' + date.getDate().toString().padStart(2, '0')
+}
+---
+
+<a class="title-writings">Writings</a>
+
+<ul class="post-list">
+  {
+    posts.map((post, index) => {
+      const year = getYear(post.pubDate)
+      const prevPost = posts[index - 1]
+      const prevYear = prevPost ? getYear(prevPost.pubDate) : null
+      const isNewYear = year !== prevYear
+
+      return (
+        <li class="post-item-wrapper">
+          <a href={`/${post.slug}/`} class="post-link">
+            <div class="post-row">
+              <div class="post-year">{isNewYear ? year : ''}</div>
+              <div class="post-title">{post.title}</div>
+              <div class="post-date">{getMonthDay(post.pubDate)}</div>
+            </div>
+          </a>
+        </li>
+      )
+    })
+  }
+</ul>
+<div class="placeholder"></div>
+
+<style>
+  ul.post-list {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a.title-writings {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: var(--serif);
+    font-size: var(--font-size-m);
+    font-style: italic;
+    letter-spacing: 0;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  .post-item-wrapper {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-link {
+    text-decoration: none;
+    display: block;
+    color: inherit;
+    transition: opacity 0.15s ease-out;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .post-list:hover .post-link {
+      opacity: 0.4;
+    }
+
+    .post-list:hover .post-link:hover {
+      opacity: 1;
+    }
+  }
+
+  .post-row {
+    display: flex;
+    align-items: baseline;
+    padding: 0.75rem 0;
+    gap: 1.5rem;
+  }
+
+  .post-year {
+    width: 3rem;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    opacity: 0.75;
+    font-family: var(--sans);
+  }
+
+  .post-title {
+    flex-grow: 1;
+    color: var(--text-primary);
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .post-date {
+    width: 3rem;
+    flex-shrink: 0;
+    text-align: right;
+    color: var(--text-secondary);
+    opacity: 0.75;
+    font-family: var(--sans);
+  }
+
+  .placeholder {
+    height: 3rem;
+  }
+</style>

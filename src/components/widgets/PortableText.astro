@@ -1,0 +1,31 @@
+---
+import { PortableText as PortableTextInternal } from 'astro-portabletext'
+import type { PortableTextBlock } from '@portabletext/types'
+import type { TOCItem } from '@/types'
+
+type Props = {
+  value: PortableTextBlock[]
+  toc?: TOCItem[]
+}
+
+const { value, toc } = Astro.props as Props
+---
+
+<PortableTextInternal value={value} />
+
+<script is:inline define:vars={{ toc }}>
+  function applyHeadingIds() {
+    if (!toc || !Array.isArray(toc) || toc.length === 0) return
+
+    const content = document.querySelector('article.content')
+    if (!content) return
+
+    const headings = Array.from(content.querySelectorAll('h2, h3'))
+
+    for (let i = 0; i < Math.min(headings.length, toc.length); i++) {
+      headings[i].id = toc[i].id
+    }
+  }
+
+  document.addEventListener('astro:page-load', applyHeadingIds)
+</script>
