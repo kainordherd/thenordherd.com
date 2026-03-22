@@ -1,5 +1,3 @@
-import type { PortableTextBlock } from '@portabletext/types'
-
 // Reading time interface
 export interface ReadingTime {
   text: string
@@ -28,10 +26,8 @@ export interface PostListProps {
   posts: PostListItem[]
 }
 
-// Full post used by the post route (Sanity-backed)
-export interface Post {
-  slug: string
-  title: string
-  pubDate: Date
-  body: PortableTextBlock[]
+// Extra metadata injected by remark plugins when rendering a post
+export interface PostRenderFrontmatter {
+  readingTime?: ReadingTime
+  toc?: TOCItem[]
 }

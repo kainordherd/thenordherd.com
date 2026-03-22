@@ -1,28 +1,7 @@
 import type { APIContext } from 'astro'
 import { Feed } from 'feed'
-import { sanityClient } from 'sanity:client'
 import { themeConfig } from '@/config'
-
-type SanityFeedPost = {
-  title: string
-  slug: string
-  publishedAt: string
-  content?: string
-}
-
-const FEED_POSTS_QUERY = /* groq */ `
-  *[
-    _type == "post" &&
-    defined(slug.current) &&
-    !(_id in path("drafts.**"))
-  ]
-  | order(coalesce(publishedAt, _createdAt) desc) {
-    title,
-    "slug": slug.current,
-    "publishedAt": coalesce(publishedAt, _createdAt),
-    "content": pt::text(body)
-  }
-`
+import { getPostExcerpt, getPostUrl, getSortedFilteredPosts } from '@/utils/draft'
 
 function escapeHtml(value: string) {
   return value
@@ -59,20 +38,19 @@ async function generateFeedInstance(context: APIContext) {
     }
   })
 
-  const posts = await sanityClient.fetch<SanityFeedPost[]>(FEED_POSTS_QUERY)
+  const posts = await getSortedFilteredPosts()
 
   for (const post of posts) {
-    const postUrl = new URL(`${post.slug}/`, siteUrl).toString()
-    const publishedAt = new Date(post.publishedAt)
-    const text = (post.content ?? '').replace(/\s+/g, ' ').trim()
-    const descriptionText = text.length > 200 ? `${text.slice(0, 200)}...` : text
+    const postUrl = new URL(getPostUrl(post), siteUrl).toString()
+    const publishedAt = post.data.pubDate
+    const text = getPostExcerpt(post)
     const htmlContent = text ? `<p>${escapeHtml(text).replace(/\n/g, '<br />')}</p>` : ''
 
     feed.addItem({
-      title: post.title,
+      title: post.data.title,
       id: postUrl,
       link: postUrl,
-      description: descriptionText,
+      description: text,
       content: htmlContent,
       date: publishedAt,
       published: publishedAt

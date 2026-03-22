@@ -14,6 +14,12 @@ export interface PostLayoutProps {
   toc?: TOCItem[]
 }
 
+// Page layout props interface
+export interface PageLayoutProps {
+  title: string
+  toc?: TOCItem[]
+}
+
 // Transition props interface
 export interface TransitionProps {
   type: 'post' | 'page'

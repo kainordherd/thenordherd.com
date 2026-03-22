@@ -1,30 +1,56 @@
 ---
 export const prerender = true
 
+import { render, type CollectionEntry } from 'astro:content'
+import PageLayout from '@/layouts/PageLayout.astro'
 import PostLayout from '@/layouts/PostLayout.astro'
-import PortableText from '@/components/widgets/PortableText.astro'
-import { getAllPostSlugs, getPostBySlug } from '@/utils/sanity'
-import { getReadingTimeFromPortableText, getTOCFromPortableText } from '@/utils/portable-text'
+import { getSortedFilteredPosts } from '@/utils/draft'
+import { getPublishedPages } from '@/utils/pages'
+import type { PostRenderFrontmatter } from '@/types'
+
+type RoutedContentEntry =
+  | { kind: 'post'; entry: CollectionEntry<'posts'> }
+  | { kind: 'page'; entry: CollectionEntry<'pages'> }
 
 export async function getStaticPaths() {
-  const slugs = await getAllPostSlugs()
-  return slugs.map((slug) => ({
-    params: { slug },
-    props: { slug }
-  }))
+  const [posts, pages] = await Promise.all([getSortedFilteredPosts(), getPublishedPages()])
+  const slugs = [...posts.map((post) => post.id), ...pages.map((page) => page.id)]
+  const duplicateSlug = slugs.find((slug, index) => slugs.indexOf(slug) !== index)
+
+  if (duplicateSlug) {
+    throw new Error(`Duplicate content slug "${duplicateSlug}" found in posts/pages collections.`)
+  }
+
+  return [
+    ...posts.map((post) => ({
+      params: { slug: post.id },
+      props: { kind: 'post', entry: post } satisfies RoutedContentEntry
+    })),
+    ...pages.map((page) => ({
+      params: { slug: page.id },
+      props: { kind: 'page', entry: page } satisfies RoutedContentEntry
+    }))
+  ]
 }
 
-const { slug } = Astro.props as { slug: string }
-const post = await getPostBySlug(slug)
-
-if (!post) {
-  throw new Error(`[Sanity] Post not found for slug: ${slug}`)
-}
-
-const readingTime = getReadingTimeFromPortableText(post.body)
-const toc = getTOCFromPortableText(post.body)
+const route = Astro.props as RoutedContentEntry
+const { Content, remarkPluginFrontmatter } = await render(route.entry)
+const { readingTime, toc = [] } = remarkPluginFrontmatter as PostRenderFrontmatter
 ---
 
-<PostLayout title={post.title} pubDate={post.pubDate} readingTime={readingTime} toc={toc}>
-  <PortableText value={post.body} toc={toc} />
-</PostLayout>
+{
+  route.kind === 'post' ? (
+    <PostLayout
+      title={route.entry.data.title}
+      pubDate={route.entry.data.pubDate}
+      readingTime={readingTime}
+      toc={toc}
+    >
+      <Content />
+    </PostLayout>
+  ) : (
+    <PageLayout title={route.entry.data.title} toc={toc}>
+      <Content />
+    </PageLayout>
+  )
+}

@@ -1,5 +1,6 @@
 import { OGImageRoute } from 'astro-og-canvas'
-import { sanityClient } from 'sanity:client'
+import { getSortedFilteredPosts } from '@/utils/draft'
+import { getPublishedPages } from '@/utils/pages'
 import { themeConfig } from '../../config'
 
 export const prerender = true
@@ -8,26 +9,13 @@ type OGPage = {
   title: string
 }
 
-type SanityOGPost = {
-  slug: string
-  title: string
-}
+const [posts, contentPages] = await Promise.all([getSortedFilteredPosts(), getPublishedPages()])
 
-const OG_POSTS_QUERY = /* groq */ `
-  *[
-    _type == "post" &&
-    defined(slug.current) &&
-    !(_id in path("drafts.**"))
-  ]{
-    title,
-    "slug": slug.current
-  }
-`
-
-const posts = await sanityClient.fetch<SanityOGPost[]>(OG_POSTS_QUERY)
-
-// Map the posts array to the `pages` shape required by `astro-og-canvas`.
-const pages = Object.fromEntries(posts.map((post) => [post.slug, { title: post.title } satisfies OGPage]))
+// Map the content entries to the `pages` shape required by `astro-og-canvas`.
+const pages = Object.fromEntries([
+  ...posts.map((post) => [post.id, { title: post.data.title } satisfies OGPage]),
+  ...contentPages.map((page) => [page.id, { title: page.data.title } satisfies OGPage])
+])
 
 export const { getStaticPaths, GET } = await OGImageRoute({
   param: 'route',

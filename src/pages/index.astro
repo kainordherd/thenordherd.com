@@ -5,9 +5,9 @@ import IndexLayout from '@/layouts/IndexLayout.astro'
 import About from '@/components/widgets/About.astro'
 import PostList from '@/components/widgets/PostList.astro'
 import { themeConfig } from '@/config'
-import { getAllPosts } from '@/utils/sanity'
+import { getPostListItems } from '@/utils/draft'
 
-const posts = await getAllPosts()
+const posts = await getPostListItems()
 ---
 
 <IndexLayout title={themeConfig.site.title} description={themeConfig.site.description}>

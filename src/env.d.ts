@@ -1,6 +1,5 @@
 /// <reference types="astro/client" />
 /// <reference types="astro/content" />
-/// <reference types="@sanity/astro/module" />
 
 declare module 'astro:content' {
   interface Render {
