@@ -1,48 +1,56 @@
 ---
-export const prerender = true
+export const prerender = false
 
-import { render, type CollectionEntry } from 'astro:content'
+import { render } from 'astro:content'
 import PageLayout from '@/layouts/PageLayout.astro'
 import PostLayout from '@/layouts/PostLayout.astro'
-import { getSortedFilteredPosts, getTextExcerpt } from '@/utils/draft'
-import { getPublishedPages } from '@/utils/pages'
-import { themeConfig } from '@/config'
+import IndexLayout from '@/layouts/IndexLayout.astro'
 import type { PostRenderFrontmatter } from '@/types'
+import {
+  getContentDescription,
+  markdownAlternateLink,
+  markdownResponse,
+  notAcceptableResponse,
+  resolveContentRoute,
+  shouldServeMarkdown
+} from '@/utils/markdown-content'
+import { preferredContentType } from '@/utils/content-negotiation'
+import { themeConfig } from '@/config'
 
-type RoutedContentEntry =
-  | { kind: 'post'; entry: CollectionEntry<'posts'> }
-  | { kind: 'page'; entry: CollectionEntry<'pages'> }
+const resolvedRoute = await resolveContentRoute(Astro.params.slug)
 
-export async function getStaticPaths() {
-  const [posts, pages] = await Promise.all([getSortedFilteredPosts(), getPublishedPages()])
-  const slugs = [...posts.map((post) => post.id), ...pages.map((page) => page.id)]
-  const duplicateSlug = slugs.find((slug, index) => slugs.indexOf(slug) !== index)
+if (!resolvedRoute) {
+  Astro.response.status = 404
+  Astro.response.statusText = 'Not Found'
+} else {
+  const preferredType = Astro.locals.preferredContentType ?? preferredContentType(Astro.request.headers.get('Accept'))
 
-  if (duplicateSlug) {
-    throw new Error(`Duplicate content slug "${duplicateSlug}" found in posts/pages collections.`)
+  if (preferredType === null && !resolvedRoute.markdownExtension) {
+    return notAcceptableResponse()
   }
 
-  return [
-    ...posts.map((post) => ({
-      params: { slug: post.id },
-      props: { kind: 'post', entry: post } satisfies RoutedContentEntry
-    })),
-    ...pages.map((page) => ({
-      params: { slug: page.id },
-      props: { kind: 'page', entry: page } satisfies RoutedContentEntry
-    }))
-  ]
+  if (shouldServeMarkdown(resolvedRoute, preferredType)) {
+    return markdownResponse(resolvedRoute)
+  }
+
+  Astro.response.headers.append('Link', markdownAlternateLink(resolvedRoute))
 }
 
-const route = Astro.props as RoutedContentEntry
-const { Content, remarkPluginFrontmatter } = await render(route.entry)
-const { readingTime, toc = [] } = remarkPluginFrontmatter as PostRenderFrontmatter
-const description =
-  route.entry.data.description || getTextExcerpt(route.entry.body, 160) || themeConfig.site.description
+const route = resolvedRoute?.route
+const rendered = route ? await render(route.entry) : null
+const Content = rendered?.Content
+const { readingTime, toc = [] } = (rendered?.remarkPluginFrontmatter ?? {}) as PostRenderFrontmatter
+const description = route ? getContentDescription(route) : 'Not Found'
 ---
 
 {
-  route.kind === 'post' ? (
+  !route || !Content ? (
+    <IndexLayout title={`404 - ${themeConfig.site.title}`} description="Not Found" noindex omitCanonical>
+      <p class="error-container" style="color: var(--text-secondary);">
+        Page Not Found...
+      </p>
+    </IndexLayout>
+  ) : route.kind === 'post' ? (
     <PostLayout
       title={route.entry.data.title}
       description={description}

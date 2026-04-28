@@ -13,13 +13,55 @@ import rehypeCopyCode from './src/plugins/rehype-copy-code.mjs'
 import remarkTOC from './src/plugins/remark-toc.mjs'
 import { themeConfig } from './src/config'
 import { imageConfig } from './src/utils/image-config'
+import fs from 'fs'
 import path from 'path'
 import netlify from '@astrojs/netlify'
 
+function getMarkdownContentSitemapPages() {
+  const siteUrl = new URL(themeConfig.site.website)
+  const contentDirs = ['src/content/posts', 'src/content/pages']
+  const pages = new Set<string>()
+
+  function walk(dir: string, baseDir: string) {
+    if (!fs.existsSync(dir)) {
+      return
+    }
+
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const entryPath = path.join(dir, entry.name)
+
+      if (entry.isDirectory()) {
+        walk(entryPath, baseDir)
+        continue
+      }
+
+      if (!entry.isFile() || !/\.(md|mdx)$/.test(entry.name)) {
+        continue
+      }
+
+      const relativePath = path.relative(baseDir, entryPath)
+      const slug = relativePath
+        .replace(/\.(md|mdx)$/, '')
+        .split(path.sep)
+        .join('/')
+
+      if (!slug.startsWith('_')) {
+        pages.add(new URL(`/${slug}/`, siteUrl).toString())
+      }
+    }
+  }
+
+  for (const contentDir of contentDirs) {
+    walk(contentDir, contentDir)
+  }
+
+  return Array.from(pages)
+}
+
 export default defineConfig({
-  // If `linkCard` is enabled we still need a server runtime for `/api/proxy`.
-  output: themeConfig.post.linkCard ? 'server' : 'static',
-  adapter: netlify(), // Set adapter for deployment, or set `linkCard` to `false` in `src/config.ts`
+  // Server output is required for Accept-based Markdown negotiation and `/api/proxy`.
+  output: 'server',
+  adapter: netlify(),
   site: themeConfig.site.website,
   image: {
     service: {
@@ -40,7 +82,9 @@ export default defineConfig({
       Exclude: [(file) => file.toLowerCase().includes('katex')]
     }),
     mdx(),
-    sitemap()
+    sitemap({
+      customPages: getMarkdownContentSitemapPages()
+    })
   ],
   vite: {
     resolve: {
