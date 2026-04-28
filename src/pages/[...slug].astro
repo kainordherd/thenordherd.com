@@ -4,8 +4,9 @@ export const prerender = true
 import { render, type CollectionEntry } from 'astro:content'
 import PageLayout from '@/layouts/PageLayout.astro'
 import PostLayout from '@/layouts/PostLayout.astro'
-import { getSortedFilteredPosts } from '@/utils/draft'
+import { getSortedFilteredPosts, getTextExcerpt } from '@/utils/draft'
 import { getPublishedPages } from '@/utils/pages'
+import { themeConfig } from '@/config'
 import type { PostRenderFrontmatter } from '@/types'
 
 type RoutedContentEntry =
@@ -36,20 +37,24 @@ export async function getStaticPaths() {
 const route = Astro.props as RoutedContentEntry
 const { Content, remarkPluginFrontmatter } = await render(route.entry)
 const { readingTime, toc = [] } = remarkPluginFrontmatter as PostRenderFrontmatter
+const description =
+  route.entry.data.description || getTextExcerpt(route.entry.body, 160) || themeConfig.site.description
 ---
 
 {
   route.kind === 'post' ? (
     <PostLayout
       title={route.entry.data.title}
+      description={description}
       pubDate={route.entry.data.pubDate}
+      image={route.entry.data.image}
       readingTime={readingTime}
       toc={toc}
     >
       <Content />
     </PostLayout>
   ) : (
-    <PageLayout title={route.entry.data.title} toc={toc}>
+    <PageLayout title={route.entry.data.title} description={description} image={route.entry.data.image} toc={toc}>
       <Content />
     </PageLayout>
   )

@@ -11,8 +11,7 @@ const posts = await getPostListItems()
 ---
 
 <IndexLayout title={themeConfig.site.title} description={themeConfig.site.description}>
+  <h1 class="sr-only">{themeConfig.site.title}</h1>
   <About />
-  <main>
-    <PostList posts={posts} />
-  </main>
+  <PostList posts={posts} />
 </IndexLayout>

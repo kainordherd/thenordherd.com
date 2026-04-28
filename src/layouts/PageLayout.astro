@@ -18,17 +18,21 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 
 import { themeConfig } from '@/config'
 
-const { title, toc } = Astro.props as PageLayoutProps
+const { title, description, image, toc } = Astro.props as PageLayoutProps
 
 const pageSlug = Astro.url.pathname.split('/').filter(Boolean).pop() || ''
-const ogImage = `/open-graph/${pageSlug}.png`
+const generatedOgImage = `/open-graph/${pageSlug}.png`
+const ogImage = image || generatedOgImage
 ---
 
-<BaseLayout title={`${title} · ${themeConfig.site.title}`} description={themeConfig.site.description} type="page">
+<BaseLayout title={`${title} · ${themeConfig.site.title}`} description={description} type="page">
   <BaseHead
     title={`${title} · ${themeConfig.site.title}`}
-    description={themeConfig.site.description}
+    description={description}
     ogImage={ogImage}
+    imageAlt={title}
+    imageWidth={image ? undefined : 1200}
+    imageHeight={image ? undefined : 630}
     slot="head"
   />
   <div class="page-container">

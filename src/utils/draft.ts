@@ -21,12 +21,14 @@ export function getPostUrl(post: CollectionEntry<'posts'>) {
   return `/${post.id}/`
 }
 
-export function getPostExcerpt(post: CollectionEntry<'posts'>, maxLength = 200) {
-  const text = post.body
+export function getTextExcerpt(markdown: string, maxLength = 200) {
+  const text = markdown
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`([^`]+)`/g, '$1')
     .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/(\*|_)(.*?)\1/g, '$2')
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/^\s*>+\s?/gm, '')
     .replace(/^\s*[-*+]\s+/gm, '')
@@ -41,6 +43,10 @@ export function getPostExcerpt(post: CollectionEntry<'posts'>, maxLength = 200) 
   }
 
   return `${text.slice(0, maxLength).trim()}...`
+}
+
+export function getPostExcerpt(post: CollectionEntry<'posts'>, maxLength = 200) {
+  return getTextExcerpt(post.body, maxLength)
 }
 
 /**

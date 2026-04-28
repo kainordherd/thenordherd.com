@@ -8,6 +8,7 @@ export interface TOCProps {
 // Post layout props interface (generic, not tied to specific data source)
 export interface PostLayoutProps {
   title: string
+  description: string
   pubDate: Date
   image?: string
   readingTime?: ReadingTime
@@ -17,6 +18,8 @@ export interface PostLayoutProps {
 // Page layout props interface
 export interface PageLayoutProps {
   title: string
+  description: string
+  image?: string
   toc?: TOCItem[]
 }
 
@@ -37,6 +40,14 @@ export interface BaseHeadProps {
   title: string
   description: string
   ogImage?: string
+  imageAlt?: string
+  imageWidth?: number
+  imageHeight?: number
+  type?: 'website' | 'article'
+  publishedTime?: Date | string
+  author?: string
+  noindex?: boolean
+  omitCanonical?: boolean
 }
 
 // ImageOptimizer component props interface
