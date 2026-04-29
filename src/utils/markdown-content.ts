@@ -63,7 +63,10 @@ export async function resolveContentRoute(rawSlug: string | undefined): Promise<
     return null
   }
 
-  const [posts, pages] = await Promise.all([getCollection('posts'), getCollection('pages')])
+  const [posts, pages]: [CollectionEntry<'posts'>[], CollectionEntry<'pages'>[]] = await Promise.all([
+    getCollection('posts'),
+    getCollection('pages')
+  ])
   const publishedPost = posts.find((post) => post.id === slug && isPublishedPost(post)) ?? null
   const publishedPage = pages.find((page) => page.id === slug && isPublishedPage(page)) ?? null
 
@@ -90,7 +93,7 @@ export async function resolveContentRoute(rawSlug: string | undefined): Promise<
 }
 
 export function getContentDescription(route: RoutedContentEntry) {
-  return route.entry.data.description || getTextExcerpt(route.entry.body, 160) || themeConfig.site.description
+  return route.entry.data.description || getTextExcerpt(route.entry.body ?? '', 160) || themeConfig.site.description
 }
 
 export function shouldServeMarkdown(
@@ -103,7 +106,7 @@ export function shouldServeMarkdown(
 export function buildMarkdownDocument(route: RoutedContentEntry) {
   const lines = [`# ${route.entry.data.title}`]
   const explicitDescription = route.entry.data.description
-  const body = documentBody(route.entry.body)
+  const body = documentBody(route.entry.body ?? '')
 
   if (route.kind === 'post' || explicitDescription) {
     lines.push('')

@@ -46,21 +46,21 @@ export function getTextExcerpt(markdown: string, maxLength = 200) {
 }
 
 export function getPostExcerpt(post: CollectionEntry<'posts'>, maxLength = 200) {
-  return getTextExcerpt(post.body, maxLength)
+  return getTextExcerpt(post.body ?? '', maxLength)
 }
 
 /**
  * Get all posts, filtering out posts whose filenames start with _
  */
-export async function getFilteredPosts() {
-  const posts = await getCollection('posts')
+export async function getFilteredPosts(): Promise<CollectionEntry<'posts'>[]> {
+  const posts: CollectionEntry<'posts'>[] = await getCollection('posts')
   return posts.filter(isPublishedPost)
 }
 
 /**
  * Get all posts sorted by publication date, filtering out posts whose filenames start with _
  */
-export async function getSortedFilteredPosts() {
+export async function getSortedFilteredPosts(): Promise<CollectionEntry<'posts'>[]> {
   const posts = await getFilteredPosts()
   return posts.sort(comparePostsByDateDesc)
 }

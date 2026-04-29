@@ -4,8 +4,8 @@ export function isPublishedPage(page: CollectionEntry<'pages'>) {
   return !page.id.startsWith('_')
 }
 
-export async function getPublishedPages() {
-  const pages = await getCollection('pages')
+export async function getPublishedPages(): Promise<CollectionEntry<'pages'>[]> {
+  const pages: CollectionEntry<'pages'>[] = await getCollection('pages')
 
   return pages.filter(isPublishedPage).sort((a, b) => a.id.localeCompare(b.id))
 }

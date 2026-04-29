@@ -78,7 +78,7 @@ export async function generateLlmsTxt(context: APIContext) {
   })
 
   const pageItems = pages.map((page) => {
-    const description = page.data.description || getTextExcerpt(page.body, 180)
+    const description = page.data.description || getTextExcerpt(page.body ?? '', 180)
 
     return listItem(page.data.title, toAbsoluteUrl(`/${page.id}/`, siteUrl), description)
   })
@@ -136,7 +136,7 @@ export async function generateLlmsFullTxt(context: APIContext) {
   ]
 
   if (about) {
-    const body = documentBody(about.body)
+    const body = documentBody(about.body ?? '')
 
     if (body) {
       sections.push('## Home', '', `URL: ${toAbsoluteUrl('/', siteUrl)}`, '', demoteHeadings(body), '')
@@ -144,7 +144,7 @@ export async function generateLlmsFullTxt(context: APIContext) {
   }
 
   for (const page of pages) {
-    const body = documentBody(page.body)
+    const body = documentBody(page.body ?? '')
 
     sections.push(`## ${page.data.title}`, '', `URL: ${toAbsoluteUrl(`/${page.id}/`, siteUrl)}`)
 
@@ -160,7 +160,7 @@ export async function generateLlmsFullTxt(context: APIContext) {
   }
 
   for (const post of posts) {
-    const body = documentBody(post.body)
+    const body = documentBody(post.body ?? '')
 
     sections.push(
       `## ${post.data.title}`,
