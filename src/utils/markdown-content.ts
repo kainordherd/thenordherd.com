@@ -92,6 +92,18 @@ export async function resolveContentRoute(rawSlug: string | undefined): Promise<
   }
 }
 
+export async function getPublishedContentSlugs() {
+  const [posts, pages]: [CollectionEntry<'posts'>[], CollectionEntry<'pages'>[]] = await Promise.all([
+    getCollection('posts'),
+    getCollection('pages')
+  ])
+
+  return [
+    ...posts.filter(isPublishedPost).map((post) => post.id),
+    ...pages.filter(isPublishedPage).map((page) => page.id)
+  ]
+}
+
 export function getContentDescription(route: RoutedContentEntry) {
   return route.entry.data.description || getTextExcerpt(route.entry.body ?? '', 160) || themeConfig.site.description
 }

@@ -59,7 +59,7 @@ function getMarkdownContentSitemapPages() {
 }
 
 export default defineConfig({
-  // Server output is required for Accept-based Markdown negotiation and `/api/proxy`.
+  // Server output is still required for `/api/proxy`; content routes are prerendered for static hosts.
   output: 'server',
   adapter: netlify(),
   site: themeConfig.site.website,

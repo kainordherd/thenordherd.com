@@ -1,5 +1,5 @@
 ---
-export const prerender = false
+export const prerender = true
 
 import { render } from 'astro:content'
 import PageLayout from '@/layouts/PageLayout.astro'
@@ -8,6 +8,7 @@ import IndexLayout from '@/layouts/IndexLayout.astro'
 import type { PostRenderFrontmatter } from '@/types'
 import {
   getContentDescription,
+  getPublishedContentSlugs,
   markdownAlternateLink,
   markdownResponse,
   notAcceptableResponse,
@@ -16,6 +17,12 @@ import {
 } from '@/utils/markdown-content'
 import { preferredContentType } from '@/utils/content-negotiation'
 import { themeConfig } from '@/config'
+
+export async function getStaticPaths() {
+  const slugs = await getPublishedContentSlugs()
+
+  return slugs.map((slug) => ({ params: { slug } }))
+}
 
 const resolvedRoute = await resolveContentRoute(Astro.params.slug)
 
