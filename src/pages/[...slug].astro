@@ -53,9 +53,12 @@ const description = route ? getContentDescription(route) : 'Not Found'
 {
   !route || !Content ? (
     <IndexLayout title={`404 - ${themeConfig.site.title}`} description="Not Found" noindex omitCanonical>
-      <p class="error-container" style="color: var(--text-secondary);">
+      <h1
+        class="error-container"
+        style="color: var(--text-secondary); font-size: var(--font-size-m); font-weight: var(--font-weight-regular); line-height: 1.75; margin: 0;"
+      >
         Page Not Found...
-      </p>
+      </h1>
     </IndexLayout>
   ) : route.kind === 'post' ? (
     <PostLayout

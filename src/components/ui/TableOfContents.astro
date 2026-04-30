@@ -125,9 +125,10 @@ const { toc = [] }: TOCProps = Astro.props
       if (!link) return
 
       e.preventDefault()
+      const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
 
       if (link.classList.contains('toc-title')) {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
+        window.scrollTo({ top: 0, behavior })
         history.pushState(null, null, '#')
       } else {
         const href = link.getAttribute('href')
@@ -137,7 +138,7 @@ const { toc = [] }: TOCProps = Astro.props
             const rect = target.getBoundingClientRect()
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop
             const offset = rect.top + scrollTop - 96
-            window.scrollTo({ top: offset, behavior: 'smooth' })
+            window.scrollTo({ top: offset, behavior })
             history.pushState(null, null, href)
           }
         }

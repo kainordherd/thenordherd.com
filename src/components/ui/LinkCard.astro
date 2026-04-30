@@ -213,6 +213,7 @@
   }
 
   .prose .link-card:hover {
+    background: var(--selection);
     background: color-mix(in srgb, var(--selection) 75%, transparent);
     text-decoration: none;
   }
@@ -285,8 +286,7 @@
 
   .prose .link-card .link-card-description {
     font-size: var(--font-size-m);
-    color: var(--text-primary);
-    opacity: 0.6;
+    color: var(--text-secondary);
     margin: 0;
     display: -webkit-box !important;
     -webkit-line-clamp: 2 !important;
@@ -315,7 +315,7 @@
   }
 
   .prose .link-card-url {
-    color: var(--text-tertiary);
+    color: var(--text-secondary);
     letter-spacing: 0.015em;
     margin: 0.25rem 0;
     display: flex;

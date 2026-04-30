@@ -277,7 +277,6 @@
   width: 1.5rem;
   text-align: left;
   color: var(--text-secondary);
-  opacity: 0.75;
   font-variant-numeric: tabular-nums;
   font-feature-settings:
     'tnum' 1,
@@ -449,7 +448,6 @@
 .prose [data-footnote-ref],
 .prose [data-footnote-backref] {
   color: var(--text-secondary);
-  opacity: 0.875;
   text-decoration: none;
   transition: color 0.2s ease-out;
   padding-right: 0.125em;
@@ -514,11 +512,6 @@
 }
 
 /* KaTeX Math Rendering */
-
-/* Hide MathML fallback to prevent duplication */
-.katex-mathml {
-  display: none !important;
-}
 
 /* Ensure display math is centered */
 .katex-display {

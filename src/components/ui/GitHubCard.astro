@@ -161,6 +161,7 @@
   }
 
   .prose .gc-container:hover {
+    background: var(--selection);
     background: color-mix(in srgb, var(--selection) 75%, transparent);
     text-decoration: none;
   }
@@ -205,8 +206,7 @@
 
   .prose .gc-repo-description {
     font-size: var(--font-size-m);
-    color: var(--text-primary);
-    opacity: 0.6;
+    color: var(--text-secondary);
     margin: 0 0 0.75rem 0;
     line-height: 1.4;
   }
@@ -214,8 +214,7 @@
   .prose .gc-info-bar {
     display: flex;
     align-items: center;
-    color: var(--text-primary);
-    opacity: 0.6;
+    color: var(--text-secondary);
     gap: 0.35rem;
   }
 
@@ -227,7 +226,7 @@
   }
 
   .prose .gc-info-icon {
-    color: var(--text-primary);
+    color: var(--text-secondary);
     width: 0.875rem;
     height: 0.875rem;
   }

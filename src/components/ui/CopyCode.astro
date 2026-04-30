@@ -47,88 +47,53 @@ import { themeConfig } from '@/config'
         button.innerHTML = copyIcon
       }
 
-      button.style.opacity = '0'
-      button.style.pointerEvents = 'none'
+      function showCopiedState() {
+        button.setAttribute('data-copying', 'true')
+        button.innerHTML = copiedIcon
 
-      // Determine the container to attach hover events
-      let container = preElement
-      const parent = button.parentElement
-      if (parent && parent.classList.contains('copy-code-wrapper')) {
-        container = parent
+        setTimeout(() => {
+          button.removeAttribute('data-copying')
+
+          setTimeout(() => {
+            button.innerHTML = copyIcon
+          }, 500)
+        }, 1500)
       }
 
-      container.addEventListener('mouseenter', () => {
-        button.style.opacity = '1'
-        button.style.pointerEvents = 'auto'
-      })
-
-      container.addEventListener('mouseleave', () => {
-        if (!button.hasAttribute('data-copying')) {
-          button.style.opacity = '0'
-          button.style.pointerEvents = 'none'
+      function copyTextToClipboard(text) {
+        if (window.isSecureContext && navigator.clipboard?.writeText) {
+          return navigator.clipboard.writeText(text)
         }
-      })
+
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.setAttribute('readonly', '')
+        textArea.style.position = 'fixed'
+        textArea.style.top = '0'
+        textArea.style.left = '0'
+        textArea.style.opacity = '0'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+
+        const copied = document.execCommand('copy')
+        document.body.removeChild(textArea)
+
+        if (!copied) {
+          throw new Error('Fallback copy failed')
+        }
+
+        return Promise.resolve()
+      }
 
       button.addEventListener('click', async () => {
         const codeText = codeElement.textContent || ''
 
         try {
-          // Primary method: use modern clipboard API
-          await navigator.clipboard.writeText(codeText)
-          button.setAttribute('data-copying', 'true')
-          button.innerHTML = copiedIcon
-
-          setTimeout(() => {
-            if (!container.matches(':hover')) {
-              button.style.opacity = '0'
-              button.style.pointerEvents = 'none'
-            }
-            button.removeAttribute('data-copying')
-
-            setTimeout(() => {
-              button.innerHTML = copyIcon
-            }, 500)
-          }, 1500)
+          await copyTextToClipboard(codeText)
+          showCopiedState()
         } catch (err) {
           console.error('Failed to copy code:', err)
-
-          // Fallback method: create temporary textarea for older browsers
-          try {
-            const textArea = document.createElement('textarea')
-            textArea.value = codeText
-            textArea.style.position = 'fixed'
-            textArea.style.opacity = '0'
-            document.body.appendChild(textArea)
-            textArea.focus()
-            textArea.select()
-
-            navigator.clipboard
-              .writeText(codeText)
-              .then(() => {
-                document.body.removeChild(textArea)
-              })
-              .catch(() => {
-                console.error('Both clipboard methods failed')
-                document.body.removeChild(textArea)
-              })
-          } catch (fallbackErr) {
-            console.error('All clipboard methods failed:', fallbackErr)
-          }
-
-          button.setAttribute('data-copying', 'true')
-          button.innerHTML = copiedIcon
-
-          setTimeout(() => {
-            if (!container.matches(':hover')) {
-              button.style.opacity = '0'
-              button.style.pointerEvents = 'none'
-            }
-            button.removeAttribute('data-copying')
-
-            setTimeout(() => {
-              button.innerHTML = copyIcon
-            }, 500)
-          }, 1500)
         }
       })
     })
@@ -166,9 +131,17 @@ import { themeConfig } from '@/config'
     align-items: center;
     justify-content: center;
     border: 1px solid var(--border);
+    -webkit-backdrop-filter: blur(48px);
     backdrop-filter: blur(48px);
     opacity: 0;
     pointer-events: none;
+  }
+
+  .copy-code-wrapper:hover .copy-button,
+  .copy-code-wrapper:focus-within .copy-button,
+  .copy-button[data-copying='true'] {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   body[data-copy-code='disabled'] .copy-button {

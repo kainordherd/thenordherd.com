@@ -55,6 +55,7 @@ const embedHandlers = {
       <iframe
         style="border-radius:12px"
         src="${embedUrl}"
+        title="Spotify embed"
         width="100%"
         height="${height}"
         frameBorder="0"

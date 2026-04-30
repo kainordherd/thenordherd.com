@@ -24,8 +24,9 @@
   /* Light Mode Colors (Default) */
   --bg: #ffffff;
   --text-primary: rgba(0, 0, 0, 0.85);
-  --text-secondary: rgba(0, 0, 0, 0.4);
+  --text-secondary: rgba(0, 0, 0, 0.56);
   --text-tertiary: rgba(0, 0, 0, 0.24);
+  --focus-ring: rgba(0, 0, 0, 0.58);
   --border: rgba(0, 0, 0, 0.1);
   --selection: rgba(0, 0, 0, 0.08);
   --code-bg: rgba(0, 0, 0, 0.04);
@@ -36,7 +37,7 @@
   --astro-code-background: rgba(0, 0, 0, 0.03);
   --astro-code-token-constant: rgba(0, 0, 0, 0.85);
   --astro-code-token-string: rgba(0, 0, 0, 0.85);
-  --astro-code-token-comment: rgba(0, 0, 0, 0.35);
+  --astro-code-token-comment: rgba(0, 0, 0, 0.56);
   --astro-code-token-keyword: rgba(0, 0, 0, 0.55);
   --astro-code-token-parameter: rgba(0, 0, 0, 0.85);
   --astro-code-token-function: rgba(0, 0, 0, 0.85);
@@ -49,8 +50,9 @@
 html.light {
   --bg: #ffffff;
   --text-primary: rgba(0, 0, 0, 0.85);
-  --text-secondary: rgba(0, 0, 0, 0.4);
+  --text-secondary: rgba(0, 0, 0, 0.56);
   --text-tertiary: rgba(0, 0, 0, 0.24);
+  --focus-ring: rgba(0, 0, 0, 0.58);
   --border: rgba(0, 0, 0, 0.1);
   --selection: rgba(0, 0, 0, 0.08);
   --code-bg: rgba(0, 0, 0, 0.04);
@@ -61,8 +63,8 @@ html.light {
   --astro-code-background: rgba(0, 0, 0, 0.03);
   --astro-code-token-constant: rgba(0, 0, 0, 0.85);
   --astro-code-token-string: rgba(0, 0, 0, 0.85);
-  --astro-code-token-comment: rgba(0, 0, 0, 0.35);
-  --astro-code-token-keyword: rgba(0, 0, 0, 0.5);
+  --astro-code-token-comment: rgba(0, 0, 0, 0.56);
+  --astro-code-token-keyword: rgba(0, 0, 0, 0.56);
   --astro-code-token-parameter: rgba(0, 0, 0, 0.85);
   --astro-code-token-function: rgba(0, 0, 0, 0.85);
   --astro-code-token-string-expression: rgba(0, 0, 0, 0.55);
@@ -74,8 +76,9 @@ html.light {
 html.dark {
   --bg: #1c1c1c;
   --text-primary: rgba(255, 255, 255, 0.9);
-  --text-secondary: rgba(255, 255, 255, 0.4);
+  --text-secondary: rgba(255, 255, 255, 0.6);
   --text-tertiary: rgba(255, 255, 255, 0.24);
+  --focus-ring: rgba(255, 255, 255, 0.62);
   --border: rgba(255, 255, 255, 0.1);
   --selection: rgba(255, 255, 255, 0.08);
   --code-bg: rgba(255, 255, 255, 0.04);
@@ -86,7 +89,7 @@ html.dark {
   --astro-code-background: rgba(255, 255, 255, 0.03);
   --astro-code-token-constant: rgba(255, 255, 255, 0.9);
   --astro-code-token-string: rgba(255, 255, 255, 0.9);
-  --astro-code-token-comment: rgba(255, 255, 255, 0.35);
+  --astro-code-token-comment: rgba(255, 255, 255, 0.6);
   --astro-code-token-keyword: rgba(255, 255, 255, 0.55);
   --astro-code-token-parameter: rgba(255, 255, 255, 0.9);
   --astro-code-token-function: rgba(255, 255, 255, 0.9);
@@ -119,8 +122,6 @@ body {
   letter-spacing: var(--spacing-m);
   padding: 6rem 1.5rem 1.5rem 1.5rem;
   overscroll-behavior-y: contain;
-  text-autospace: normal;
-  text-spacing-trim: space-first;
   text-rendering: optimizeLegibility;
   font-synthesis: none;
   word-wrap: break-word;
@@ -151,8 +152,20 @@ body {
 }
 
 :focus-visible {
-  outline: 1.5px dashed var(--text-tertiary);
+  outline: 1.5px dashed var(--focus-ring);
   border-radius: 0.25rem;
+}
+
+@supports (text-autospace: normal) {
+  body {
+    text-autospace: normal;
+  }
+}
+
+@supports (text-spacing-trim: space-first) {
+  body {
+    text-spacing-trim: space-first;
+  }
 }
 
 body[data-width] {
@@ -174,7 +187,6 @@ main {
   margin: 0;
   font-weight: var(--font-weight-light);
   color: var(--text-secondary);
-  opacity: 0.75;
   flex-shrink: 0;
   letter-spacing: var(--spacing-s);
   font-variant-numeric: tabular-nums;
