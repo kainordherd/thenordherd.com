@@ -17,8 +17,12 @@ export function toPostListItem(post: CollectionEntry<'posts'>): PostListItem {
   }
 }
 
+export function getPostPathForSlug(slug: string) {
+  return `/${slug.replace(/^\/+|\/+$/g, '')}`
+}
+
 export function getPostUrl(post: CollectionEntry<'posts'>) {
-  return `/${post.id}/`
+  return getPostPathForSlug(post.id)
 }
 
 export function getTextExcerpt(markdown: string, maxLength = 200) {

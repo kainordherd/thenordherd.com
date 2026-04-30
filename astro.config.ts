@@ -46,7 +46,7 @@ function getMarkdownContentSitemapPages() {
         .join('/')
 
       if (!slug.startsWith('_')) {
-        pages.add(new URL(`/${slug}/`, siteUrl).toString())
+        pages.add(new URL(`/${slug}`, siteUrl).toString())
       }
     }
   }
@@ -63,6 +63,7 @@ export default defineConfig({
   output: 'server',
   adapter: netlify(),
   site: themeConfig.site.website,
+  trailingSlash: 'never',
   image: {
     service: {
       entrypoint: 'astro/assets/services/sharp',

@@ -5,8 +5,6 @@ import { themeConfig } from '@/config'
 import type { BaseHeadProps } from '@/types/component.types'
 import 'katex/dist/katex.min.css'
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site)
-
 const {
   title,
   description,
@@ -21,6 +19,8 @@ const {
   omitCanonical = false
 } = Astro.props as BaseHeadProps
 
+const canonicalPath = Astro.url.pathname === '/' ? '/' : Astro.url.pathname.replace(/\/+$/, '')
+const canonicalURL = new URL(canonicalPath, Astro.site)
 const pageTitle = title || themeConfig.site.title
 const pageDescription = description || themeConfig.site.description
 const pageUrl = canonicalURL

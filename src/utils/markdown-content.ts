@@ -41,7 +41,7 @@ function normalizeSlug(rawSlug: string | undefined) {
 }
 
 function canonicalPathForSlug(slug: string) {
-  return `/${slug}/`
+  return `/${slug}`
 }
 
 function markdownPathForSlug(slug: string) {

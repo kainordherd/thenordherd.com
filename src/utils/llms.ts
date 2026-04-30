@@ -80,7 +80,7 @@ export async function generateLlmsTxt(context: APIContext) {
   const pageItems = pages.map((page) => {
     const description = page.data.description || getTextExcerpt(page.body ?? '', 180)
 
-    return listItem(page.data.title, toAbsoluteUrl(`/${page.id}/`, siteUrl), description)
+    return listItem(page.data.title, toAbsoluteUrl(`/${page.id}`, siteUrl), description)
   })
 
   const lines = [
@@ -146,7 +146,7 @@ export async function generateLlmsFullTxt(context: APIContext) {
   for (const page of pages) {
     const body = documentBody(page.body ?? '')
 
-    sections.push(`## ${page.data.title}`, '', `URL: ${toAbsoluteUrl(`/${page.id}/`, siteUrl)}`)
+    sections.push(`## ${page.data.title}`, '', `URL: ${toAbsoluteUrl(`/${page.id}`, siteUrl)}`)
 
     if (page.data.description) {
       sections.push(`Description: ${oneLine(page.data.description)}`)

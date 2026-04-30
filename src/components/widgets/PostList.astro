@@ -1,5 +1,6 @@
 ---
 import type { PostListProps } from '@/types'
+import { getPostPathForSlug } from '@/utils/draft'
 
 const { posts } = Astro.props as PostListProps
 
@@ -21,7 +22,7 @@ const getMonthDay = (date: Date) => {
 
       return (
         <li class="post-item-wrapper">
-          <a href={`/${post.slug}/`} class="post-link">
+          <a href={getPostPathForSlug(post.slug)} class="post-link">
             <div class="post-row">
               <div class="post-year">{isNewYear ? year : ''}</div>
               <div class="post-title">{post.title}</div>
